@@ -1,12 +1,16 @@
-# Team Zesta - Rapid Automatic License Plate Recognition
-Swift license plate recognition deep learning model with a cross-platform(mobile, web) front-end to obtain info. pertaining to the vehicle in real-time, built for The Fest Hackathon - Randomize MUJ.
+<h1 align='center'> Zesta - Your Car App </h1>
+<div align='center'>
+    <img src='./assets/image_proj.jpg' alt='A phone scannning a car toobtaining relevant information regarding the same' height='400' />
+</div>
 
-![image_proj](https://github.com/DivitMittal/zesta-license-plate-recog/blob/master/assets/image_proj.jpg?raw=true)
+Swift license plate recognition deep learning model with a cross-platform front-end to obtain info. pertaining to the vehicle in real-time.
 
----
+### Technologies/Frameworks/Non-standard libraries used:
 
-### Team Members
-- [Divit Mittal (Team Leader)](https://github.com/DivitMittal)
-- Divyendu Sigh Bhati
-- Mohd. Ramin Zaheer
-
+| Technology                    | Utility                     |
+| ----------                    | -------                     |
+| Expo (React-Native Framework) | iOS, Android, Web Frontends |
+| NodeJS                        | Server Backend              |
+| Tensorflow                    | ML Tasks                    |
+| Keras                         | Deployed                    |
+| OpenCV                        | Image Processing            |

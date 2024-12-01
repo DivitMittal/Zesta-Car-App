@@ -14,7 +14,9 @@
     "assetBundlePatterns": [
       "**/*"
     ],
-    "plugins": ["expo-camera"],
+    "plugins": [
+      "expo-camera"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.zesta.lpr"
@@ -24,11 +26,20 @@
         "foregroundImage": "./assets/logo.png",
         "backgroundColor": "#000000"
       },
-      "package": "com.zesta.lpr"
+      "package": "com.zesta.lpr",
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/logo.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "92cab298-1621-4832-9a36-86de60ce7e90"
+      }
+    },
+    "owner": "dimv"
   }
 }
-
