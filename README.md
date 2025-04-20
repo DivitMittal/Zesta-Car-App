@@ -8,7 +8,7 @@ Swift license plate recognition deep learning model with a cross-platform front-
 ### Technologies/Frameworks/Non-standard libraries used:
 
 | Technology                    | Utility                     |
-| ----------                    | -------                     |
+| ----------------------------- | --------------------------- |
 | Expo (React-Native Framework) | iOS, Android, Web Frontends |
 | NodeJS                        | Server Backend              |
 | Tensorflow                    | ML Tasks                    |

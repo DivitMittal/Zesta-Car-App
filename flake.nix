@@ -15,6 +15,8 @@
       systems = builtins.import inputs.systems;
       imports = [inputs.treefmt-nix.flakeModule];
       perSystem.treefmt = {
+        projectRootFile = "flake.nix";
+
         flakeCheck = false;
 
         programs = {
@@ -28,8 +30,6 @@
           ## Python
           black.enable = true;
         };
-
-        projectRootFile = "flake.nix";
       };
     };
 }
