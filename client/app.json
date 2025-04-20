@@ -11,12 +11,8 @@
       "resizeMode": "contain",
       "backgroundColor": "#000000"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
-    "plugins": [
-      "expo-camera"
-    ],
+    "assetBundlePatterns": ["**/*"],
+    "plugins": ["expo-camera"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.zesta.lpr"
