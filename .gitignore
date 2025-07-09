@@ -172,3 +172,11 @@ yarn-error.*
 # macOS
 .DS_Store
 *.pem
+
+## nix builds & caching
+.direnv
+result
+result-*
+
+## git pre-commit hooks (handled via cachix/git-hooks)
+.pre-commit-config.yaml
