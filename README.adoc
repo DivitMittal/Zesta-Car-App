@@ -2,9 +2,8 @@
 :doctype: article
 :icons: font
 :source-highlighter: rouge
-:toc: left
+:toc: centre
 :toclevels: 3
-:sectlinks:
 :imagesdir: ./assets
 
 [.text-center]
