@@ -1,348 +1,132 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import React, { useState, useEffect, useCallback } from "react";
+import { View, Text, TouchableOpacity, Image } from "react-native";
 import { Camera } from "expo-camera";
 import { LinearGradient } from "expo-linear-gradient";
-import * as FileSystem from "expo-file-system";
-import fortu from "./assets/fortu.jpeg";
+import * as FS from "expo-file-system";
 
-const App = () => {
-  const [hasPermission, setHasPermission] = useState(null);
-  const [type, setType] = useState(Camera.Constants.Type.back);
-  const [camera, setCamera] = useState(null);
-  const [imageArray, setImageArray] = useState([]);
-  const exampleImageUri = Image.resolveAssetSource(fortu).uri;
-  const [Options, setOptions] = useState([
-    {
-      id: 1,
-      type: "Captured Image",
-      owner: "",
-      imageSource: exampleImageUri,
-    },
-    {
-      id: 2,
-      type: "DL2CAP0941",
-      owner:
-        "Divit Mittal, Delhi\n\nPollution Check: Valid\nValid Insurance: Expired\nCriminal Record: Clean",
-    },
-  ]);
+import { useWebSocket } from "./hooks/useWebSocket";
+import { styles, GRADIENT_COLORS } from "./styles/appStyles";
+import placeholder from "./assets/fortu.jpeg";
 
-  const reqPermCam = () => {
+const MOCK_INFO = [
+  { id: 1, type: "Captured Image", owner: "", imageSource: null },
+  {
+    id: 2,
+    type: "DL2CAP0941",
+    owner: "Divit Mittal, Delhi\n\nPollution Check: Valid\nValid Insurance: Expired\nCriminal Record: Clean",
+  },
+];
+
+export default function App() {
+  const [permission, setPermission] = useState(null);
+  const [camType, setCamType] = useState(Camera.Constants.Type.back);
+  const [cam, setCam] = useState(null);
+  const [images, setImages] = useState([]);
+  const [info, setInfo] = useState(MOCK_INFO);
+
+  const placeholderUri = Image.resolveAssetSource(placeholder).uri;
+  const { send, lastMsg } = useWebSocket();
+
+  useEffect(() => {
     (async () => {
       const { status } = await Camera.requestCameraPermissionsAsync();
-      setHasPermission(status === "granted");
+      setPermission(status === "granted");
     })();
-  };
+  }, []);
 
-  const ws = new WebSocket("ws://192.168.86.177:2121");
-  const stWebSocket = () => {
-    const maxRetries = 5;
-    let retryCount = 0;
-    const connectWebSocket = () => {
-      ws.onopen = () => {
-        console.log("WebSocket connection opened");
-        retryCount = 0; // Reset retry count on successful connection
-      };
-      ws.onerror = (e) => {
-        console.log(e.message);
-      };
-      ws.onclose = (e) => {
-        console.log(e.code, e.reason);
-        if (retryCount < maxRetries) {
-          console.log(`Retrying connection (Attempt ${retryCount + 1})...`);
-          retryCount++;
-          setTimeout(connectWebSocket, 3000);
-        } else {
-          console.log("Max retries reached. Unable to establish connection.");
-        }
-      };
-    };
-    connectWebSocket();
-  };
-
-  // const stWebSocket = () => {
-  //     try {
-  //         ws.onopen = () => {
-  //             console.log("WebSocket connection opened");
-  //         };
-  //         ws.onerror = (e) => {
-  //             console.log(e.message);
-  //         };
-  //         ws.onclose = (e) => {
-  //             console.log(e.code, e.reason);
-  //         };
-  //     } catch (e) {
-  //         console.log(e);
-  //     }
-  // };
-
-  useEffect(reqPermCam, []);
-  useEffect(stWebSocket, []);
-
-  if (hasPermission === null) {
-    return <View />;
-  }
-
-  if (hasPermission === false) {
-    return <Text>No access to camera</Text>;
-  }
-
-  const takePicture = async () => {
-    if (camera) {
-      const photo = await camera.takePictureAsync(null);
-      const asset = await FileSystem.getInfoAsync(photo.uri);
-
-      const newImageUri = `${FileSystem.documentDirectory}${Date.now()}.jpg`;
-
-      await FileSystem.moveAsync({
-        from: asset.uri,
-        to: newImageUri,
+  useEffect(() => {
+    if (lastMsg?.licensePlate) {
+      setInfo((prev) => {
+        const copy = [...prev];
+        copy[1] = { ...copy[1], type: lastMsg.licensePlate };
+        return copy;
       });
-
-      const newImageArray = [...imageArray, newImageUri];
-      setImageArray(newImageArray);
     }
-  };
+  }, [lastMsg]);
 
-  const discardImage = (imageUri) => {
-    const updatedImageArray = imageArray.filter((uri) => uri !== imageUri);
-    setImageArray(updatedImageArray);
+  const flip = useCallback(() => {
+    setCamType((t) =>
+      t === Camera.Constants.Type.back
+        ? Camera.Constants.Type.front
+        : Camera.Constants.Type.back
+    );
+  }, []);
 
-    FileSystem.deleteAsync(imageUri, { idempotent: true });
-  };
+  const snap = useCallback(async () => {
+    if (!cam) return;
+    const photo = await cam.takePictureAsync(null);
+    const dest = `${FS.documentDirectory}${Date.now()}.jpg`;
+    await FS.moveAsync({ from: photo.uri, to: dest });
+    setImages((prev) => [...prev, dest]);
+  }, [cam]);
 
-  const encImage = async (uri) => {
+  const discard = useCallback(async (uri) => {
+    setImages((prev) => prev.filter((u) => u !== uri));
+    await FS.deleteAsync(uri, { idempotent: true });
+  }, []);
+
+  const submit = useCallback(async () => {
+    if (!images.length) return;
     try {
-      const base64String = await FileSystem.readAsStringAsync(uri, {
-        encoding: FileSystem.EncodingType.Base64,
+      const uri = images[images.length - 1];
+      const b64 = await FS.readAsStringAsync(uri, { encoding: FS.EncodingType.Base64 });
+      send(b64);
+      setInfo((prev) => {
+        const copy = [...prev];
+        copy[0] = { ...copy[0], imageSource: uri };
+        return copy;
       });
-      return base64String;
-    } catch (error) {
-      console.error("Error reading image:", error);
-      throw error;
+    } catch (e) {
+      console.error(e);
     }
-  };
+  }, [images, send]);
 
-  const saveImages = async () => {
-    try {
-      clickImgURI = imageArray[imageArray.length - 1];
-      const base64String = await encImage(clickImgURI);
-      ws.send(base64String);
-
-      const updatedOptions = [...Options];
-      updatedOptions[0] = {
-        id: 1,
-        type: "Captured Image",
-        owner: "",
-        imageSource: clickImgURI,
-      };
-
-      // ws.onmessage = (event) => {
-      //     const licensePlateIds = event.data;
-      //     console.log(licensePlateIds);
-      //     updatedOptions[1] = {
-      //         id: 2,
-      //         type: licensePlateIds,
-      //         owner: "Divit Mittal, Delhi\n\nPollution Check: Valid\nValid Insurance: Expired\nCriminal Record: Clean",
-      //     };
-      // };
-
-      ws.onmessage = (event) => {
-        console.log(event.data);
-      };
-
-      setOptions(updatedOptions);
-    } catch (error) {
-      console.error("Error saving images:", error);
-    }
-  };
-
-  const darkGradientColors = ["#0F0F0F", "#1A1A1A"];
-
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      justifyContent: "flex-end",
-      borderRadius: 5,
-      alignItems: "center",
-      marginTop: 30,
-    },
-    logo: {
-      width: 100,
-      height: 110,
-      margin: 10,
-      marginTop: 20,
-    },
-    zestaText: {
-      fontSize: 24,
-      fontWeight: "bold",
-      color: "white",
-      marginBottom: 10,
-    },
-    cameraContainer: {
-      flex: 1,
-      margin: 10,
-      height: "70%",
-      width: "90%",
-      borderRadius: 50,
-      overflow: "hidden",
-      marginTop: 0,
-    },
-    optionsContainer: {
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
-      padding: 10,
-      borderTopLeftRadius: 40,
-      borderTopRightRadius: 40,
-      width: "100%",
-      flexDirection: "row",
-      justifyContent: "space-between",
-    },
-    option: {
-      flex: 1,
-      marginRight: 5,
-      color: "white",
-      borderWidth: 1,
-      backgroundColor: "white",
-      borderColor: "black",
-      borderRadius: 8,
-      padding: 10,
-      marginBottom: 10,
-    },
-    optionType: {
-      fontSize: 18,
-      fontWeight: "bold",
-      color: "red",
-    },
-    optionOwner: {
-      marginTop: 0,
-      color: "black",
-    },
-    CarButton: {
-      backgroundColor: "green",
-      padding: 16,
-      borderRadius: 8,
-      margin: 16,
-      alignItems: "center",
-    },
-    CarText: {
-      color: "white",
-      fontSize: 18,
-      fontWeight: "bold",
-    },
-    savedImage: {
-      width: 100,
-      height: 100,
-      margin: 5,
-      borderRadius: 5,
-    },
-    discardButton: {
-      backgroundColor: "red",
-      padding: 8,
-      borderRadius: 5,
-      marginTop: 5,
-      alignItems: "center",
-    },
-    discardText: {
-      color: "white",
-      fontSize: 14,
-    },
-  });
+  if (permission === null) return <View />;
+  if (!permission) return <Text>No camera access</Text>;
 
   return (
-    <LinearGradient colors={darkGradientColors} style={{ flex: 1 }}>
+    <LinearGradient colors={GRADIENT_COLORS} style={{ flex: 1 }}>
       <View style={styles.container}>
         <Image source={require("./assets/logo.png")} style={styles.logo} />
         <Text style={styles.zestaText}>ZESTA</Text>
 
         <View style={styles.cameraContainer}>
-          <Camera
-            style={{
-              flex: 1,
-              borderWidth: 3,
-              borderColor: "black",
-              borderRadius: 20,
-              overflow: "hidden",
-            }}
-            type={type}
-            ref={(ref) => setCamera(ref)}
-          >
-            <View
-              style={{
-                flex: 1,
-                backgroundColor: "transparent",
-                flexDirection: "column",
-              }}
-            >
-              <TouchableOpacity
-                style={{
-                  flex: 0.1,
-                  alignSelf: "flex-end",
-                  alignItems: "center",
-                }}
-                onPress={() => {
-                  setType(
-                    type === Camera.Constants.Type.back
-                      ? Camera.Constants.Type.front
-                      : Camera.Constants.Type.back,
-                  );
-                }}
-              />
+          <Camera style={styles.camera} type={camType} ref={setCam}>
+            <View style={styles.cameraInner}>
+              <TouchableOpacity style={styles.flipButton} onPress={flip} />
             </View>
           </Camera>
         </View>
 
         <View style={styles.optionsContainer}>
-          {Options.map((option) => (
-            <TouchableOpacity key={option.id} style={styles.option}>
-              <Text
-                style={[
-                  styles.optionType,
-                  option.id === 1 && { color: "black" },
-                ]}
-              >
-                {option.type}
+          {info.map((opt) => (
+            <TouchableOpacity key={opt.id} style={styles.option}>
+              <Text style={[styles.optionType, opt.id === 1 && styles.optionTypeBlack]}>
+                {opt.type}
               </Text>
-              {option.imageSource && (
+              {(opt.imageSource || (opt.id === 1 && placeholderUri)) && (
                 <Image
-                  source={{ uri: option.imageSource }}
-                  style={{
-                    width: 150,
-                    height: 110,
-                    marginBottom: 1,
-                    borderRadius: 10,
-                  }}
+                  source={{ uri: opt.imageSource || placeholderUri }}
+                  style={styles.optionImage}
                 />
               )}
-              <Text
-                style={[
-                  styles.optionOwner,
-                  option.id === 3 && { color: "red" },
-                ]}
-              >
-                {option.owner}
+              <Text style={[styles.optionOwner, opt.id === 3 && styles.optionOwnerRed]}>
+                {opt.owner}
               </Text>
             </TouchableOpacity>
           ))}
         </View>
 
-        <TouchableOpacity style={styles.CarButton} onPress={takePicture}>
-          <Text style={styles.CarText}>Click!!</Text>
+        <TouchableOpacity style={styles.actionButton} onPress={snap}>
+          <Text style={styles.actionButtonText}>Click!!</Text>
         </TouchableOpacity>
 
-        {imageArray.length > 0 && (
-          <View
-            style={{
-              flexDirection: "row",
-              flexWrap: "wrap",
-              marginTop: 20,
-            }}
-          >
-            {imageArray.map((image, index) => (
-              <View key={index} style={{ margin: 5 }}>
-                <Image source={{ uri: image }} style={styles.savedImage} />
-                <TouchableOpacity
-                  onPress={() => discardImage(image)}
-                  style={styles.discardButton}
-                >
+        {images.length > 0 && (
+          <View style={styles.imageGallery}>
+            {images.map((img, i) => (
+              <View key={i} style={styles.imageContainer}>
+                <Image source={{ uri: img }} style={styles.savedImage} />
+                <TouchableOpacity onPress={() => discard(img)} style={styles.discardButton}>
                   <Text style={styles.discardText}>Discard</Text>
                 </TouchableOpacity>
               </View>
@@ -350,14 +134,12 @@ const App = () => {
           </View>
         )}
 
-        {imageArray.length > 0 && (
-          <TouchableOpacity style={styles.CarButton} onPress={saveImages}>
-            <Text style={styles.CarText}>Send to server for evaluation!!</Text>
+        {images.length > 0 && (
+          <TouchableOpacity style={styles.actionButton} onPress={submit}>
+            <Text style={styles.actionButtonText}>Send to server for evaluation!!</Text>
           </TouchableOpacity>
         )}
       </View>
     </LinearGradient>
   );
-};
-
-export default App;
+}
