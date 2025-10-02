@@ -1,0 +1,24 @@
+[project]
+name = "zesta-server"
+version = "1.0.0"
+description = "Zesta-Car-App server: license plate recognition ML backend"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+    "opencv-python",
+    "tensorflow",
+    "keras",
+    "easyocr",
+    "ultralytics",
+]
+
+[dependency-groups]
+dev = [
+    "matplotlib",
+    "numpy",
+    "pandas",
+    "jupyter",
+]
+
+# Application project, not an installable package.
+[tool.uv]
+package = false
