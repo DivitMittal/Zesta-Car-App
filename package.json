@@ -1,0 +1,13 @@
+{
+  "name": "zesta-car-app",
+  "version": "1.0.0",
+  "private": true,
+  "packageManager": "pnpm@11.5.2",
+  "scripts": {
+    "client:start": "pnpm --filter zesta-license-plate-recog start",
+    "client:android": "pnpm --filter zesta-license-plate-recog android",
+    "client:ios": "pnpm --filter zesta-license-plate-recog ios",
+    "client:web": "pnpm --filter zesta-license-plate-recog web",
+    "server:test": "pnpm --filter server test"
+  }
+}

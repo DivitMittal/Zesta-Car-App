@@ -1,0 +1,10 @@
+# Native projects are generated on demand via Continuous Native Generation
+# (expo prebuild) and are not tracked for this managed Expo app.
+/android
+/ios
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts

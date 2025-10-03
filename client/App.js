@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { View, Text, TouchableOpacity, Image } from "react-native";
-import { Camera } from "expo-camera";
+import { CameraView, useCameraPermissions } from "expo-camera";
 import { LinearGradient } from "expo-linear-gradient";
-import * as FS from "expo-file-system";
+// expo-file-system's classic API moved under /legacy in SDK 52+.
+import * as FS from "expo-file-system/legacy";
 
 import { useWebSocket } from "./hooks/useWebSocket";
 import { styles, GRADIENT_COLORS } from "./styles/appStyles";
@@ -18,9 +19,9 @@ const MOCK_INFO = [
 ];
 
 export default function App() {
-  const [permission, setPermission] = useState(null);
-  const [camType, setCamType] = useState(Camera.Constants.Type.back);
-  const [cam, setCam] = useState(null);
+  const [permission, requestPermission] = useCameraPermissions();
+  const [facing, setFacing] = useState("back");
+  const cam = useRef(null);
   const [images, setImages] = useState([]);
   const [info, setInfo] = useState(MOCK_INFO);
 
@@ -28,11 +29,10 @@ export default function App() {
   const { send, lastMsg } = useWebSocket();
 
   useEffect(() => {
-    (async () => {
-      const { status } = await Camera.requestCameraPermissionsAsync();
-      setPermission(status === "granted");
-    })();
-  }, []);
+    if (permission && !permission.granted && permission.canAskAgain) {
+      requestPermission();
+    }
+  }, [permission, requestPermission]);
 
   useEffect(() => {
     if (lastMsg?.licensePlate) {
@@ -45,20 +45,16 @@ export default function App() {
   }, [lastMsg]);
 
   const flip = useCallback(() => {
-    setCamType((t) =>
-      t === Camera.Constants.Type.back
-        ? Camera.Constants.Type.front
-        : Camera.Constants.Type.back
-    );
+    setFacing((f) => (f === "back" ? "front" : "back"));
   }, []);
 
   const snap = useCallback(async () => {
-    if (!cam) return;
-    const photo = await cam.takePictureAsync(null);
+    if (!cam.current) return;
+    const photo = await cam.current.takePictureAsync();
     const dest = `${FS.documentDirectory}${Date.now()}.jpg`;
     await FS.moveAsync({ from: photo.uri, to: dest });
     setImages((prev) => [...prev, dest]);
-  }, [cam]);
+  }, []);
 
   const discard = useCallback(async (uri) => {
     setImages((prev) => prev.filter((u) => u !== uri));
@@ -81,8 +77,8 @@ export default function App() {
     }
   }, [images, send]);
 
-  if (permission === null) return <View />;
-  if (!permission) return <Text>No camera access</Text>;
+  if (!permission) return <View />;
+  if (!permission.granted) return <Text>No camera access</Text>;
 
   return (
     <LinearGradient colors={GRADIENT_COLORS} style={{ flex: 1 }}>
@@ -91,11 +87,11 @@ export default function App() {
         <Text style={styles.zestaText}>ZESTA</Text>
 
         <View style={styles.cameraContainer}>
-          <Camera style={styles.camera} type={camType} ref={setCam}>
+          <CameraView style={styles.camera} facing={facing} ref={cam}>
             <View style={styles.cameraInner}>
               <TouchableOpacity style={styles.flipButton} onPress={flip} />
             </View>
-          </Camera>
+          </CameraView>
         </View>
 
         <View style={styles.optionsContainer}>

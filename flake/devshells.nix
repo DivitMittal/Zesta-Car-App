@@ -12,7 +12,7 @@
   }: {
     devshells.default = {
       devshell = rec {
-        name = "Zesta Car App";
+        name = "zesta-car-app";
         motd = "{202}Welcome to {91}${name} {202}devshell!{reset} \n $(menu)";
         startup = {
           git-hooks.text = ''
@@ -22,12 +22,10 @@
         packages = lib.attrsets.attrValues {
           inherit
             (pkgs)
-            ## LSPs & Formatters
+            ### LSPs & Formatters
+            ## Nix
             nixd
             alejandra
-            ## Documentation
-            asciidoctor-with-extensions
-            graphviz-nox
             ;
         };
       };
