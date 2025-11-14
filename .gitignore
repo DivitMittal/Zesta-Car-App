@@ -180,3 +180,8 @@ result-*
 
 ## git pre-commit hooks (handled via cachix/git-hooks)
 .pre-commit-config.yaml
+
+## Tools
+.mcp*
+.claude*
+Claude.md
