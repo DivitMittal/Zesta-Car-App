@@ -1,0 +1,41 @@
+cff-version: 1.2.0
+title: Zesta - Your Car App
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Divit
+    family-names: Mittal
+    email: 64.69.76.69.74.m@gmail.com
+repository-code: 'https://github.com/DivitMittal/Zesta-Car-App'
+url: 'https://github.com/DivitMittal/Zesta-Car-App'
+abstract: >-
+  Swift license plate recognition deep learning model with a
+  cross-platform front-end to obtain info. pertaining to the
+  vehicle in real-time. Zesta is a cross-platform mobile
+  application that allows you to scan a vehicle's license
+  plate and get information about it in real-time. The app
+  uses your phone's camera to capture an image of the license
+  plate, sends it to a server for processing, and displays
+  the results. The backend is powered by a Node.js server
+  that communicates with a Python script using deep learning
+  for license plate recognition.
+keywords:
+  - license-plate-recognition
+  - computer-vision
+  - deep-learning
+  - YOLO
+  - OCR
+  - EasyOCR
+  - OpenCV
+  - React-Native
+  - Expo
+  - mobile-app
+  - cross-platform
+  - machine-learning
+  - NodeJS
+  - Python
+  - vehicle-information
+license: MIT
+date-released: '2024-01-20'
