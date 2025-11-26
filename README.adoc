@@ -22,43 +22,51 @@ The backend is powered by a Node.js server that communicates with a Python scrip
 
 == Architecture
 
-[graphviz, ZestaArchitecture, png]
-----
-digraph ZestaArchitecture {
-    rankdir="LR";
-    node [shape=box, style=rounded, fontname="Helvetica"];
-    edge [fontname="Helvetica"];
+image::ZestaArchitecture.png[Zesta Architecture Diagram, align="center"]
 
-    subgraph Client {
-        label="Client (React Native / Expo)";
-        rank=same;
-        App [label="Mobile App (iOS/Android/Web)"];
-    }
-
-    subgraph Server {
-        label="Backend Server";
-        rank=same;
-        NodeJS [label="Node.js Server"];
-        Python [label="Python ML Script"];
-    }
-
-    subgraph ML_Model {
-        label="Machine Learning Libraries";
-        rank=same;
-        YOLO [label="Ultralytics (YOLO)"];
-        EasyOCR [label="EasyOCR"];
-        OpenCV [label="OpenCV"];
-    }
-
-    App -> NodeJS [label="Image (WebSocket)"];
-    NodeJS -> Python [label="Image Data"];
-    Python -> YOLO [label="Detect Plate"];
-    Python -> EasyOCR [label="Recognize Text"];
-    Python -> OpenCV [label="Process Image"];
-    Python -> NodeJS [label="License Plate Number"];
-    NodeJS -> App [label="Vehicle Info (WebSocket)"];
-}
-----
+// Source: The diagram is generated from Graphviz DOT.
+// To regenerate: asciidoctor -r asciidoctor-diagram README.adoc
+//
+// [graphviz, ZestaArchitecture, png]
+// ----
+// digraph ZestaArchitecture {
+//     rankdir="LR";
+//     node [shape=box, style="rounded,filled", fillcolor=lightblue, fontname="Helvetica"];
+//     edge [fontname="Helvetica", fontsize=10];
+//
+//     subgraph cluster_client {
+//         label="Client (React Native / Expo)";
+//         style=filled;
+//         fillcolor=lightgray;
+//         App [label="Mobile App\n(iOS/Android/Web)"];
+//     }
+//
+//     subgraph cluster_server {
+//         label="Backend Server";
+//         style=filled;
+//         fillcolor=lightgray;
+//         NodeJS [label="Node.js Server"];
+//         Python [label="Python ML Script"];
+//     }
+//
+//     subgraph cluster_ml {
+//         label="Machine Learning Libraries";
+//         style=filled;
+//         fillcolor=lightgray;
+//         YOLO [label="Ultralytics\n(YOLO)"];
+//         EasyOCR [label="EasyOCR"];
+//         OpenCV [label="OpenCV"];
+//     }
+//
+//     App -> NodeJS [label="  Image (base64)  ", fontsize=9];
+//     NodeJS -> Python [label="  Image Data  "];
+//     Python -> YOLO [label="  Detect Plate  "];
+//     Python -> EasyOCR [label="  Recognize Text  "];
+//     Python -> OpenCV [label="  Process Image  "];
+//     Python -> NodeJS [label="  License Plate #  "];
+//     NodeJS -> App [label="  Vehicle Info  ", fontsize=9];
+// }
+// ----
 
 == Features
 
