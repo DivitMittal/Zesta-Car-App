@@ -6,6 +6,9 @@
 :toclevels: 3
 :imagesdir: ./assets
 
+image:https://github.com/DivitMittal/Zesta-Car-App/actions/workflows/flake-check.yml/badge.svg[Flake Check]
+image:https://github.com/DivitMittal/Zesta-Car-App/actions/workflows/flake-lock-update.yml/badge.svg[Flake Lock Update]
+
 [.text-center]
 image::image_proj.jpg[A phone scannning a car toobtaining relevant information regarding the same, height=400]
 
