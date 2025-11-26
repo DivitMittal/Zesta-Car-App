@@ -185,3 +185,7 @@ result-*
 .mcp*
 .claude*
 Claude.md
+
+## AsciiDoctor
+.asciidoctor/
+README.html
