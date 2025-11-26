@@ -12,7 +12,7 @@
   _module.args = {
     common-on = rec {
       push = {
-        branches = ["main"];
+        branches = ["master"];
         paths = [
           "flake.nix"
           "flake.lock"
