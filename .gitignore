@@ -182,9 +182,10 @@ result-*
 .pre-commit-config.yaml
 
 ## Tools
+.claude/
+AGENTS.md
 .mcp*
-.claude*
-Claude.md
+.serena*
 
 ## AsciiDoctor
 .asciidoctor/
