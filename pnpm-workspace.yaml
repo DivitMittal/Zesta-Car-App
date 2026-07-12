@@ -1,3 +1,8 @@
 packages:
   - client
   - server
+overrides:
+  undici: ^6.27.0
+  joi: ^17.13.4
+  postcss: ^8.5.10
+  'js-yaml@<4.0.0': ^3.15.0
