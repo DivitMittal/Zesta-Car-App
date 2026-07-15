@@ -6,3 +6,6 @@ overrides:
   joi: ^17.13.4
   postcss: ^8.5.10
   'js-yaml@<4.0.0': ^3.15.0
+  uuid: ^11.1.1
+  fast-xml-parser: ^5.3.4
+  ip: "link:./stubs/ip-stub"
