@@ -1,0 +1,24 @@
+lockfile_version: '1'
+generated_at: '2026-07-24T02:17:11.476774+00:00'
+dependencies: []
+mcp_servers:
+- serena
+mcp_configs:
+  serena:
+    name: serena
+    transport: stdio
+    args:
+    - --from
+    - git+https://github.com/oraios/serena
+    - serena
+    - start-mcp-server
+    - --context
+    - claude-code
+    - --project
+    - ~/Projects/Zesta-Car-App
+    registry: false
+    command: uvx
+local_deployed_files:
+- .claude/rules/project-knowledge.md
+local_deployed_file_hashes:
+  .claude/rules/project-knowledge.md: sha256:f2400d7fcbe5cf1152a2fae6b7fc6a91509394b45210c095d2333553cfa47c25

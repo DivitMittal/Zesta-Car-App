@@ -1,0 +1,27 @@
+name: zesta-car-app
+version: 1.0.0
+description: Cross-platform React Native mobile app for real-time license plate recognition using YOLO and EasyOCR
+author: DivitMittal
+license: MIT
+target:
+  - claude
+  - codex
+  - opencode
+
+type: instructions
+
+dependencies:
+  mcp:
+    - name: serena
+      registry: false
+      transport: stdio
+      command: uvx
+      args:
+        - --from
+        - git+https://github.com/oraios/serena
+        - serena
+        - start-mcp-server
+        - --context
+        - claude-code
+        - --project
+        - ~/Projects/Zesta-Car-App

@@ -182,11 +182,20 @@ result-*
 .pre-commit-config.yaml
 
 ## Tools
-.claude/
-AGENTS.md
-.mcp*
 .serena*
 
 ## AsciiDoctor
 .asciidoctor/
 README.html
+
+## APM — generated; do not edit directly
+apm_modules/
+.codex/
+.claude/
+.opencode/
+.mcp*
+opencode.json
+.github/copilot-instructions.md
+AGENTS.md
+CLAUDE.md
+GEMINI.md
