@@ -6,6 +6,12 @@ overrides:
   joi: ^17.13.4
   postcss: ^8.5.10
   'js-yaml@<4.0.0': ^3.15.0
+  'js-yaml@>=4.0.0 <4.3.0': ^4.3.0
   uuid: ^11.1.1
-  fast-xml-parser: ^5.3.4
+  fast-xml-parser: ^5.10.1
+  tar: ^7.5.19
+  shell-quote: ^1.9.0
+  'brace-expansion@>=1.0.0 <2.0.0': ^1.1.16
+  'brace-expansion@>=2.0.0 <3.0.0': ^2.1.2
+  'brace-expansion@>=5.0.0 <6.0.0': ^5.0.7
   ip: "link:./stubs/ip-stub"
