@@ -2,7 +2,7 @@ name: zesta-car-app
 version: 1.0.0
 description: Cross-platform React Native mobile app for real-time license plate recognition using YOLO and EasyOCR
 author: DivitMittal
-license: MIT
+license: LicenseRef-HONCL-1.0
 target:
   - claude
   - codex
